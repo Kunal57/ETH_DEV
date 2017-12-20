@@ -1,6 +1,22 @@
 pragma solidity ^0.4.17;
 
-contract Contract {
+contract Bank {
+    uint private value;
+
+    function deposit(uint amount) {
+        value += amount;
+    }
+
+    function withdraw(uint amount) {
+        value -= amount;
+    }
+
+    function balance() returns (uint) {
+        return value;
+    }
+}
+
+contract Contract is Bank {
     string private name;
     uint private age;
 
