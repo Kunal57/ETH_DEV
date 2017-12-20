@@ -38,8 +38,8 @@ contract Token is Coin("TK", "Token", 18, 1000), ERC20, ERC223 {
             isContract(_to)) {
             _balanceOf[msg.sender] -= _value;
             _balanceOf[_to] += _value;
-            ERC223ReceivingContract _contract = new ERC223ReceivingContract(_to);
-            _contract.tokenFallBack(msg.sender, _value, _data);
+            ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
+            _contract.tokenFallback(msg.sender, _value, _data);
             Transfer(msg.sender, _to, _value, _data);
             return true;
         }
