@@ -1,6 +1,11 @@
 pragma solidity ^0.4.17;
 
-contract Bank {
+interface Regulator {
+    function checkValue(uint amount) returns (bool);
+    function loan() returns (bool);
+}
+
+contract Bank is Regulator {
     uint private value;
 
     function Bank(uint amount) {
@@ -12,14 +17,22 @@ contract Bank {
     }
 
     function withdraw(uint amount) {
-        value -= amount;
+        if (checkValue(amount)) {
+            value -= amount;
+        }
     }
 
     function balance() returns (uint) {
         return value;
     }
 
-    function loan() returns (bool);
+    function checkValue(uint amount) returns (bool) {
+        return amount <= value;
+    }
+
+    function loan() returns (bool) {
+        return value > 0;
+    }
 }
 
 contract Contract is Bank(10) {
@@ -40,9 +53,5 @@ contract Contract is Bank(10) {
 
     function getAge() returns (uint) {
         return age;
-    }
-
-    function loan() returns (bool) {
-        return true;
     }
 }
