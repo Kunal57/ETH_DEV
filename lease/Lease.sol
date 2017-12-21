@@ -7,9 +7,18 @@ contract TimeBased {
 
     uint private leaseTime = 600;
 
+    modifier expire(address _addr) {
+        if (_expiryOf[_addr] >= block.timestamp) {
+            _expiryOf[_addr] = 0;
+            _balanceOf[_addr] = 0;
+        }
+        _;
+    }
+
     function lease()
         public
         payable
+        expire(msg.sender)
         returns (bool) {
         require(msg.value == 1 ether);
         require(_balanceOf[msg.sender] == 0);
@@ -26,6 +35,7 @@ contract TimeBased {
 
     function balanceOf(address _addr)
         public
+        expire(_addr)
         returns (uint) {
         return _balanceOf[_addr];
     }
