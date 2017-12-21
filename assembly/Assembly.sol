@@ -42,4 +42,13 @@ contract Assembly {
             }
         }
     }
+
+    function asmReturns(uint _v) public returns (uint) {
+        // Inline Assembly
+        assembly {
+            let _ptr := add(msize(), 1)
+            mstore(_ptr, _v)
+            return(_ptr, 0x20)
+        }
+    }
 }
