@@ -7,6 +7,17 @@ contract Assembly {
         }
     }
 
+    function asmLoops() public returns (uint _r) {
+        // Inline Assembly
+        assembly {
+            let i := 0
+            loop:
+            i := add(i, 1)
+            _r := add(_r, 1)
+            jumpi(loop, lt(i, 10))
+        }
+    }
+
     function nativeConditional(uint _v) public returns (uint) {
         if (5 == _v) {
             return 55;
