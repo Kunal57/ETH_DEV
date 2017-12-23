@@ -70,7 +70,7 @@ contract MultiSigWallet {
         TransactionCreated(msg.sender, to, amount, transactionId);
     }
 
-    function getPendingTransactions() public validOwner returns (uint[]) {
+    function getPendingTransactions() public view validOwner returns (uint[]) {
         return _pendingTransactions;
     }
 
@@ -92,8 +92,8 @@ contract MultiSigWallet {
         TransactionSigned(msg.sender, transactionId);
 
         if (transaction.signatureCount >= MIN_SIGNATURES) {
-            require(address(this).balance >= amount);
-            transaction.to.transfer(amount);
+            require(address(this).balance >= transaction.amount);
+            transaction.to.transfer(transaction.amount);
             TransactionCompleted(transaction.from, transaction.to, transaction.amount, transactionId);
             deleteTransaction(transactionId);
         }
@@ -110,7 +110,7 @@ contract MultiSigWallet {
         }
         delete _pendingTransactions[_pendingTransactions.length - 1];
         _pendingTransactions.length--;
-        delete _transaction[transactionId];
+        delete _transactions[transactionId];
     }
 
     function walletBalance() public constant returns (uint) {
