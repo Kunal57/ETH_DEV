@@ -14,6 +14,8 @@ contract MultiSigWallet {
         _;
     }
 
+    event DepositFunds(address from, uint amount);
+
     function MultiSigWallet() public {
         _owner = msg.sender;
     }
@@ -24,5 +26,14 @@ contract MultiSigWallet {
 
     function removeOwner(address existingOwner) public isOwner {
         _owners[existingOwner] = 0;
+    }
+
+    function () public payable {
+        DepositFunds(msg.sender, msg.value);
+    }
+
+    function withdraw(uint amount) public validOwner {
+        require(address(this).balance >= amount);
+        msg.sender.transfer(amount);
     }
 }
