@@ -5,6 +5,20 @@ contract MultiSigWallet {
     address private _owner;
     mapping (address => uint8) private _owners;
 
+    uint constant MIN_SIGNATURES = 2;
+    uint private _transactionIdx;
+
+    struct Transaction {
+        address from;
+        address to;
+        uint amount;
+        uint8 signatureCount;
+        mapping (address => uint8) signatures;
+    }
+
+    mapping (uint => Transaction) private _transactions;
+    uint[] private _pendingTransactions;
+
     modifier isOwner() {
         require(msg.sender == _owner);
         _;
@@ -37,13 +51,13 @@ contract MultiSigWallet {
 
     function withdraw(uint amount) public validOwner {
         require(address(this).balance >= amount);
-        msg.sender.transfer(amount);
+
         WithdrawFunds(msg.sender, amount);
     }
 
     function transferTo(address to, uint amount) public validOwner {
         require(address(this).balance >= amount);
-        to.transfer(amount);
+
         TransferFunds(msg.sender, to, amount);
     }
 }
