@@ -113,4 +113,8 @@ contract MultiSigWallet {
         delete _transaction[transactionId];
     }
 
+    function walletBalance() public constant returns (uint) {
+        return address(this).balance;
+    }
+
 }
