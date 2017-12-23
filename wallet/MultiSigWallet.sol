@@ -1,6 +1,7 @@
 pragma solidity ^0.4.17;
 
 contract MultiSigWallet {
+
     address private _owner;
     mapping (address => uint8) private _owners;
 
@@ -15,17 +16,19 @@ contract MultiSigWallet {
     }
 
     event DepositFunds(address from, uint amount);
+    event WithdrawFunds(address to, uint amount);
+    event TransferFunds(address from, address to, uint amount);
 
     function MultiSigWallet() public {
         _owner = msg.sender;
     }
 
-    function addOwner(address newOwner) public isOwner {
-        _owners[newOwner] = 1;
+    function addOwner(address owner) public isOwner {
+        _owners[owner] = 1;
     }
 
-    function removeOwner(address existingOwner) public isOwner {
-        _owners[existingOwner] = 0;
+    function removeOwner(address owner) public isOwner {
+        _owners[owner] = 0;
     }
 
     function () public payable {
@@ -35,5 +38,12 @@ contract MultiSigWallet {
     function withdraw(uint amount) public validOwner {
         require(address(this).balance >= amount);
         msg.sender.transfer(amount);
+        WithdrawFunds(msg.sender, amount);
+    }
+
+    function transferTo(address to, uint amount) public validOwner {
+        require(address(this).balance >= amount);
+        msg.sender.transfer(amount);
+        TransferFunds(msg.sender, to, amount);
     }
 }
