@@ -15,7 +15,23 @@ contract Crowdsale is ERC223ReceivingContract {
   uint private _limit;
   uint private _balance;
 
-  function Crowdsale(address token, uint start, uint end, uint price, uint limit) {
+  mapping (address => uint) private _limits;
+
+  modifier isAvailable() {
+    require(block.number >= _start && block.number < _end);
+    require(_balance > 0);
+    _;
+  }
+
+  modifier withinLimit(address recipient, uint value) {
+    uint amount = value.div(_price);
+    require(_limits[recipient].add(amount) <= _limit);
+    _;
+  }
+
+  event Buy(address beneficiary, uint amount);
+
+  function Crowdsale(address token, uint start, uint end, uint price, uint limit) public {
     _token = Token(token);
     _start = start;
     _end = end;
@@ -27,13 +43,20 @@ contract Crowdsale is ERC223ReceivingContract {
     return _balance;
   }
 
+  function () public payable {
+    revert();
+  }
+
   function buy() public payable {
     buyFor(msg.sender);
   }
 
-  function buyFor(address beneficiary) public payable {
-    _token.transfer(beneficiary, 1);
-    _balance = _balance.sub(1);
+  function buyFor(address beneficiary) public isAvailable withinLimit(beneficiary, msg.value) payable {
+    uint amount = msg.value.div(_price);
+    _token.transfer(beneficiary, amount);
+    _limits[beneficiary] = _limits[beneficiary].add(amount);
+    _balance = _balance.sub(amount);
+    Buy(beneficiary, amount);
   }
 
   function tokenFallback(address _from, uint _value, bytes _data) public {
